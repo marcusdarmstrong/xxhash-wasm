@@ -6,9 +6,19 @@
   "main": "./cjs/xxhash-wasm.cjs",
   "module": "./esm/xxhash-wasm.js",
   "exports": {
-    "types": "./types.d.ts",
-    "import": "./esm/xxhash-wasm.js",
-    "require": "./cjs/xxhash-wasm.cjs"
+    "./xxh3": {
+      "import": "./esm/xxh3.js",
+      "require": "./cjs/xxh3.cjs"
+    },
+    "./xxh3-perf": {
+      "import": "./esm/xxh3-perf.js",
+      "require": "./cjs/xxh3-perf.cjs"
+    },
+    ".": {
+      "types": "./types.d.ts",
+      "import": "./esm/xxhash-wasm.js",
+      "require": "./cjs/xxhash-wasm.cjs"
+    }
   },
   "types": "./types.d.ts",
   "author": "Michael Jungo <michaeljungo92@gmail.com>",
@@ -32,7 +42,7 @@
   "scripts": {
     "build": "yarn run build-wasm && yarn run build-js",
     "build-js": "rollup -c",
-    "build-wasm": "wasm-opt --enable-bulk-memory -O4 src/xxhash.wat -o src/xxhash.wasm",
+    "build-wasm": "wasm-opt --enable-bulk-memory -O4 src/xxhash.wat -o src/xxhash.wasm && wasm-opt --enable-bulk-memory --enable-simd -O4 src/xxh3.wat -o src/xxh3.wasm && wasm-opt --enable-bulk-memory --enable-simd -O4 src/xxh3-perf.wat -o src/xxh3-perf.wasm",
     "clean": "rimraf coverage cjs esm umd",
     "fix": "eslint . --fix",
     "lint": "eslint .",

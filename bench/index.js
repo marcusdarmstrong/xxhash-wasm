@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 const Benchmark = require("benchmark");
 const xxhash = require("xxhash-wasm");
+const xxh3 = require("xxhash-wasm/xxh3");
+const xxh3p = require("xxhash-wasm/xxh3-perf");
 const XXH = require("xxhashjs");
 
 // This is the highest utf-8 character that uses only one byte. A string will be
@@ -31,6 +33,9 @@ const handlers = {
     const fastest = this.filter("fastest").map("name");
     console.log(`Benchmark ${this.name} - Fastest is ${fastest}`);
   },
+  onError(err){
+    console.error(err);
+  }
 };
 
 const seed = 0;
@@ -39,6 +44,8 @@ const seedBigInt = 0n;
 async function runBench() {
   console.time("wasm setup");
   const { h32, h64 } = await xxhash();
+  const { h3 } = await xxh3();
+  const { h3: h3p } = await xxh3p();
   console.timeEnd("wasm setup");
 
   for (let i = 1; i <= 1e8; i *= 10) {
@@ -46,20 +53,27 @@ async function runBench() {
     const input = randomString(i);
 
     suite
-      .add("xxhashjs#h32", () => {
+      /*.add("xxhashjs#h32", () => {
         XXH.h32(input, seed).toString(16);
       })
       .add("xxhashjs#h64", () => {
         XXH.h64(input, seed).toString(16);
-      })
+      })*/
       .add("xxhash-wasm#h32", () => {
         h32(input, seed);
       })
       .add("xxhash-wasm#h64", () => {
         h64(input, seedBigInt);
       })
+      //.add("xxhash-wasm/xxh3", () => {
+        //h3(input, seedBigInt);
+      //})
+      .add("xxhash-wasm/xxh3-perf", () => {
+        h3p(input, seedBigInt);
+      })
       .run();
   }
 }
 
 runBench();
+
